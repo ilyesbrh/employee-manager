@@ -68,6 +68,16 @@ export const workersSlice = createSlice({
             return state;
 
         },
+        // reset the current selected worker in state with the data from the action payload
+        resetCurrentWorker: (state: WorkersState, Action: PayloadAction<null>) => {
+
+            // update the current selected worker
+            state.currentWorker = null;
+            state.workerForm = initialState.workerForm;
+
+            return state;
+
+        },
 
         // update the current selected worker form in state with the data from the action payload
         updateWorkerForm: (state: WorkersState, Action: PayloadAction<WorkerForm>) => {
@@ -97,7 +107,7 @@ export const workersSlice = createSlice({
 })
 
 /* expose actions */
-export const { updateWorkers, updateCurrentWorker, updateWorkerForm, updateWorkerFilter } = workersSlice.actions;
+export const { updateWorkers, updateCurrentWorker, updateWorkerForm, updateWorkerFilter, resetCurrentWorker } = workersSlice.actions;
 
 /* expose selectors */
 export const selectWorkers = (state: RootState) => state.workersReducer.workers;

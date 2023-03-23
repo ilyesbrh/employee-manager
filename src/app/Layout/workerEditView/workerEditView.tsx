@@ -12,7 +12,7 @@ import { createWorker, getWorker, updateWorker } from "../../../services/api.ser
 import { mapWorkerToWorkerForm } from "../../../services/mapper.service";
 import { enqueueSnackbar } from "notistack";
 import UploadAvatar from "../../components/imageUploader";
-import { selectCurrentWorker, selectWorkerForm, updateCurrentWorker, updateWorkerForm } from "../../../store/workers";
+import { resetCurrentWorker, selectCurrentWorker, selectWorkerForm, updateCurrentWorker, updateWorkerForm } from "../../../store/workers";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 
 
@@ -41,7 +41,15 @@ const WorkerEditView: FunctionComponent<any> = () => {
     // Did mount hook
     useEffect(() => {
 
-        if (!id) return;
+        console.log('here');
+        
+
+        if (!id) {
+
+            dispatcher(resetCurrentWorker(null));
+
+            return;
+        };
 
         // Load the worker data when the component mounts
         getWorker(id).then(worker => worker ? dispatcher(updateCurrentWorker(worker)) : null);
