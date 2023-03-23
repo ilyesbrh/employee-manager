@@ -6,6 +6,7 @@ import { WorkersFilter } from '../models/worker';
 
 
 /* Axios setup */
+// Creating an axios instance with custom headers and timeout values
 const api = axios.create({
     baseURL: 'https://dev-api-1.sitedocs.com/api/v1/',
     timeout: 100000,
@@ -14,6 +15,7 @@ const api = axios.create({
     }
 });
 
+// Interceptor to handle error responses and display snackbars accordingly
 api.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -45,6 +47,7 @@ api.interceptors.response.use(
 
 /* Api Endpoints */
 
+// Function to fetch workers data with filters applied
 export const getWorkers = async (filter: WorkersFilter | { page: number, count: number } | null) => {
     const config = {
         params: {
@@ -60,6 +63,7 @@ export const getWorkers = async (filter: WorkersFilter | { page: number, count: 
     }
 };
 
+// Function to fetch data of a single worker
 export const getWorker = async (workerId?: string) => {
 
     try {
@@ -70,6 +74,7 @@ export const getWorker = async (workerId?: string) => {
     }
 };
 
+// Function to fetch locations of a single worker
 export const getWorkerLocations = async (workerId?: string) => {
 
     try {
@@ -80,6 +85,7 @@ export const getWorkerLocations = async (workerId?: string) => {
     }
 };
 
+// Function to fetch worker image
 export const getWorkerImage = async (id: any) => {
     const response = await api.get('workers/photo/' + id, { responseType: "blob" });
 
@@ -92,7 +98,7 @@ export const getWorkerImage = async (id: any) => {
     return objectUrl;
 }
 
-
+// Function to update worker status
 export const updateWorkerStatus = async (workerId: string, enable: boolean) => {
 
     const body = {
@@ -108,6 +114,7 @@ export const updateWorkerStatus = async (workerId: string, enable: boolean) => {
     }
 };
 
+// Function to create a new worker
 export const createWorker = async (workerData: WorkerForm) => {
 
 
@@ -115,13 +122,14 @@ export const createWorker = async (workerData: WorkerForm) => {
     return response.data;
 };
 
+// Update the worker data using PUT method
 export const updateWorker = async (workerId: any, workerData: WorkerForm) => {
-
 
     const response = await api.put(`workers`, { ...workerData, Id: workerId });
     return response.data;
 };
 
+// Update the worker image using PUT method
 export const UpdateImage = async (workerId: string, selectedFile: string | Blob) => {
     const formData = new FormData();
     formData.append("photo", selectedFile);
@@ -137,12 +145,8 @@ export const UpdateImage = async (workerId: string, selectedFile: string | Blob)
                 },
             }
         );
-        
         return response.data;
-
-        
     } catch (error) {
-
         return null;
     }
 }

@@ -35,7 +35,7 @@ describe('workerMapper', () => {
                 PostalCode: '12345',
                 MobileNumber: '555-555-5555',
                 PhoneNumber: '555-123-4567',
-                DateHired: dayjs('2021-01-01T00:00:00'),
+                DateHired: '2021-01-01T00:00:00',
                 Position: '',
                 EmployeeNumber: '12345',
                 EmergencyContact1: 'Jane Doe',

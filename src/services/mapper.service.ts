@@ -1,4 +1,3 @@
-import dayjs, { Dayjs } from 'dayjs';
 import { WorkerForm, Worker } from '../models/worker';
 
 export function mapWorkerToWorkerForm(worker: Worker): WorkerForm {
@@ -11,7 +10,7 @@ export function mapWorkerToWorkerForm(worker: Worker): WorkerForm {
         PostalCode: worker.PostalCode,
         MobileNumber: worker.MobileNumber,
         PhoneNumber: worker.PhoneNumber,
-        DateHired: dayjs(worker.DateHired),
+        DateHired: worker.DateHired,
         Position: '',
         EmployeeNumber: worker.EmployeeNumber,
         EmergencyContact1: worker.EmergencyContact1,

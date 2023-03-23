@@ -1,6 +1,5 @@
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { FunctionComponent, useRef, useState } from "react";
 import Avatar from "@mui/material/Avatar";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { UpdateImage } from "../../services/api.service";
 import { enqueueSnackbar } from "notistack";
@@ -8,31 +7,37 @@ import { IconButton } from "@mui/material";
 
 const UploadAvatar: FunctionComponent<any> = ({ workerId }: any) => {
 
+  // define a reference to an input element
   const inputFileRef = useRef<HTMLInputElement>(null);
 
+  // define a state for the data URL of the image
   const [dataUrl, setDataUrl] = useState<string>('');
 
   /* Handlers */
+
+  // handle the click event for the avatar, triggering the file input click event
   const handleAvatarClick = (event: any) => {
     console.log('avatar click');
     inputFileRef.current?.click();
 
   };
 
-  // On file changed
+  // handle the change event for the file input, displaying the image preview and uploading the new image
   const handleFileInputChange = (event: any) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    // read the file data as a data URL
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       if (typeof reader.result == 'string') setDataUrl(reader.result);
     };
 
-    // Upload new picture
+    // upload the new image using the UpdateImage function
     UpdateImage(workerId, file).then(res => {
 
+      // display a success message if the image was uploaded successfully
       if (res) enqueueSnackbar('Image changed successfully', {
         variant: 'success',
       });

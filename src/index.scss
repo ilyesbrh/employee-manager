@@ -5,6 +5,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  min-height: 100vh;
+
+  background-color: whitesmoke!important;
 }
 
 code {
@@ -12,6 +16,6 @@ code {
     monospace;
 }
 
-p{
-  margin: 0!important;
+p {
+  margin: 0 !important;
 }
