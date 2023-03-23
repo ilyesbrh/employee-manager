@@ -1,60 +1,59 @@
-import { FunctionComponent, useEffect, useState } from "react";
-import { Table, TableHead, TableBody, TableCell, TablePagination, TableRow, TextField, Paper, FormControlLabel, Switch } from '@mui/material';
-import { useNavigate } from "react-router-dom";
+import { FunctionComponent, useEffect } from "react";
+import { Table, TableHead, TableBody, TableCell, TablePagination, TableRow, TextField, Paper, FormControlLabel, Switch, Fab } from '@mui/material';
+import { Link, useNavigate } from "react-router-dom";
 
 import "./workerList.scss";
-import { Worker, WorkersFilter } from "../../../models/worker";
+import { Worker } from "../../../models/worker";
 import { getWorkers } from "../../../services/api.service";
+import AddIcon from '@mui/icons-material/Add';
+import { selectWorkers, selectWorkersFilter, updateWorkerFilter, updateWorkers } from "../../../store/workers";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 
-interface WorkersProps {
+interface WorkersProps { }
 
-}
-
+// Define the component
 const WorkersList: FunctionComponent<WorkersProps> = () => {
-
-    const [workers, setWorkers] = useState<Worker[]>([]);
-
+    // Get the navigation function and dispatcher from the store
     const navigator = useNavigate();
+    const dispatcher = useAppDispatch();
 
-    const [filter, setFilter] = useState<WorkersFilter>({
-        firstName: '',
-        lastName: '',
-        jobTitle: '',
-        isArchived: false,
-        locationId: '',
-        page: 0,
-        count: 10
-    });
+    // Get the workers and filters from the store
+    const workers = useAppSelector(selectWorkers);
+    const filter = useAppSelector(selectWorkersFilter);
 
+    // Load the workers when the component mounts or when the filter changes
     useEffect(() => {
 
-        getWorkers(filter).then((data) => {
+        getWorkers(filter).then((data: Array<Worker> | undefined) => {
             if (data) {
-                setWorkers(data);
-            } else {
-                setWorkers([]);
+                dispatcher(updateWorkers(data));
             }
         });
-    }, [filter]);
+    }, [dispatcher, filter]);
 
+    // Handle changes to the filter inputs
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setFilter((prevFilter: any) => ({ ...prevFilter, [name]: value, page: 1 }));
+        dispatcher(updateWorkerFilter({ ...filter, [name]: value, page: 0 }));
     };
 
+    // Handle toggling the "archived" filter
     const handleArchivedToggle = () => {
-        setFilter((prevFilter) => ({ ...prevFilter, isArchived: !prevFilter.isArchived, page: 1 }));
+        dispatcher(updateWorkerFilter({ ...filter, isArchived: !filter.isArchived, page: 0 }));
     };
 
+    // Handle changing the page number
     const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-        setFilter((prevFilter) => ({ ...prevFilter, page }));
+        dispatcher(updateWorkerFilter({ ...filter, page }));
     };
 
+    // Handle changing the number of rows per page
     const handleCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const count = parseInt(event.target.value);
-        setFilter((prevFilter) => ({ ...prevFilter, count, page: 1 }));
+        dispatcher(updateWorkerFilter({ ...filter, count, page: 1 }));
     };
 
+    // Handle clicking on a row
     const handleRowClick = (Id: string) => {
         navigator('/workers/' + Id);
     }
@@ -124,6 +123,11 @@ const WorkersList: FunctionComponent<WorkersProps> = () => {
                     />
                 </Paper>
             </div>
+            <Link to="/workers/edit">
+                <Fab color="primary" aria-label="add" className="add-fab" >
+                    <AddIcon />
+                </Fab>
+            </Link>
         </>
     );
 }

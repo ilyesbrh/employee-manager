@@ -1,54 +1,61 @@
 import { FunctionComponent, useEffect, useState } from "react";
-import { Avatar, Button, Paper, Chip } from "@mui/material";
+import { Button, Paper, Chip } from "@mui/material";
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineOppositeContent } from '@mui/lab';
 
 import dayjs from "dayjs";
 
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import "./workerDetails.scss";
-import { getWorkerImage, getWorker, getWorkerLocations, updateWorkerStatus } from "../../../services/api.service";
-import { Worker, WorkerLocations } from "../../../models/worker";
+import { getWorker, getWorkerLocations, updateWorkerStatus } from "../../../services/api.service";
+import { WorkerLocations } from "../../../models/worker";
 import { enqueueSnackbar } from "notistack";
 import UploadAvatar from "../../components/imageUploader";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { selectCurrentWorker, updateCurrentWorker } from "../../../store/workers";
 
 
 const WorkerDetails: FunctionComponent<any> = () => {
 
+    // Get the navigation function and dispatcher from the store
     const navigator = useNavigate();
+    const dispatcher = useAppDispatch();
 
-    // Worker params
+    // Get the worker ID from the URL
     const { id } = useParams();
 
     // Worker locations 
     const [locations, setLocations] = useState<Array<WorkerLocations>>([]);
 
-    // Worker object
-    const [worker, setWorker] = useState<Worker | null>(null);
-
+    // Get the worker object from the store
+    const worker = useAppSelector(selectCurrentWorker);
 
     /* Lifecycle hooks */
 
     // Did mount hook
     useEffect(() => {
 
-        // load worker data
-        getWorker(id).then(worker => worker ? setWorker(worker) : null);
+        // Load the worker data and update the current worker object
+        getWorker(id).then(worker => {
+            if (worker) dispatcher(updateCurrentWorker(worker));
+        });
 
-        // load worker locations
+        // Get the worker's locations from the API
         getWorkerLocations(id).then(locations => locations ? setLocations(locations) : null);
 
-    }, [id]);
+    }, [dispatcher, id]);
 
 
     /* Handlers */
 
-    const handleEdit = (event: any) => {
+    // Handle clicking the "edit" button
+    const handleEdit = () => {
         navigator('edit');
     }
 
-    const handleStatusEdit = (event: any) => {
+    // Handle clicking the "status" button
+    const handleStatusEdit = () => {
         if (!id) return;
 
         updateWorkerStatus(id, !worker?.Active).then((_) => {
@@ -58,16 +65,17 @@ const WorkerDetails: FunctionComponent<any> = () => {
 
             if (!worker) return;
 
-            setWorker({ ...worker, Active: !worker?.Active });
+            // update current worker object
+            dispatcher(updateCurrentWorker({ ...worker, Active: !worker?.Active }));
         });
 
     }
 
     return (
-        <div className="container mb-5">
+        <div className="container mb-5" style={{ maxWidth: 500 }}>
             <Paper className="h-100 p-4">
                 <div className="row account-settings">
-                    <div className="col-12 user-profile d-flex flex-column align-items-start justify-content-center w-100">
+                    <div className="col-12 user-profile d-flex flex-column align-items-start justify-content-center">
                         <UploadAvatar workerId={worker?.Id} className="m-4" />
                         <div className="d-flex">
                             <h3 className="user-name">

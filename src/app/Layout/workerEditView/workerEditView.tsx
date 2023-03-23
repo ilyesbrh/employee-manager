@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { Button, TextField, Grid, Paper } from "@mui/material";
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -9,54 +9,32 @@ import { useNavigate } from "react-router-dom";
 
 import "./workerEditView.scss";
 import { createWorker, getWorker, updateWorker } from "../../../services/api.service";
-import { Worker, WorkerForm } from "../../../models/worker";
 import { mapWorkerToWorkerForm } from "../../../services/mapper.service";
 import { enqueueSnackbar } from "notistack";
 import UploadAvatar from "../../components/imageUploader";
+import { selectCurrentWorker, selectWorkerForm, updateCurrentWorker, updateWorkerForm } from "../../../store/workers";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 
 
 const WorkerEditView: FunctionComponent<any> = () => {
 
+    // Get the navigation function and dispatcher from the store
     const navigator = useNavigate();
+    const dispatcher = useAppDispatch();
 
-    // Worker params
+    // Get the worker ID from the URL
     const { id } = useParams();
 
-    // Worker object
-    const [worker, setWorker] = useState<Worker | null>(null);
+    // Get the current worker and worker form from the store
+    const worker = useAppSelector(selectCurrentWorker);
+    const workerForm = useAppSelector(selectWorkerForm);
 
-    // worker changed
+    // Set the worker form when the worker changes
     useEffect(() => {
         if (!worker) return;
-
         // set worker form object when worker changes
-        setWorkerForm(mapWorkerToWorkerForm(worker));
-
-    }, [worker]);
-
-    // Worker form state
-    const [workerForm, setWorkerForm] = useState<WorkerForm>({
-        FirstName: "",
-        LastName: "",
-        JobTitle: "",
-        StreetAddress: "",
-        City: "",
-        PostalCode: "",
-        MobileNumber: "",
-        PhoneNumber: "",
-        DateHired: dayjs(Date.now()),
-        Position: "",
-        EmployeeNumber: "",
-        EmergencyContact1: "",
-        EmergencyContact2: "",
-        EmergencyNotes: "",
-    });
-
-    useEffect(() => {
-
-        // worker form changed
-    }, [workerForm]);
-
+        dispatcher(updateWorkerForm(mapWorkerToWorkerForm(worker)));
+    }, [dispatcher, worker]);
 
     /* Lifecycle hooks */
 
@@ -65,34 +43,42 @@ const WorkerEditView: FunctionComponent<any> = () => {
 
         if (!id) return;
 
-        // load worker data
-        getWorker(id).then(worker => worker ? setWorker(worker) : null);
+        // Load the worker data when the component mounts
+        getWorker(id).then(worker => worker ? dispatcher(updateCurrentWorker(worker)) : null);
 
-    }, [id]);
+    }, [dispatcher, id]);
 
     /* Actions Handlers */
+
+    // Handle changes to the worker form inputs
     const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
         const { name, value } = event.target;
-        setWorkerForm({ ...workerForm, [name]: value });
+
+        dispatcher(updateWorkerForm({ ...workerForm, [name]: value }));
     };
 
+    // Handle changes to the "date hired" input
     const handleDateHiredChange = (date: any) => {
-        setWorkerForm({
+
+        dispatcher(updateWorkerForm({
             ...workerForm,
-            DateHired: date,
-        });
+            DateHired: date.toISOString(),
+        }));
+
     };
 
+    // Handle clicking the "cancel" button
     const handelCancelClick = (event: any) => {
         navigator('../');
     };
 
+    // Handle clicking the "update" or "create" button
     const handelUpdateClick = async (event: any) => {
         event.preventDefault();
 
         try {
             if (id) {
-                // Update worker
+                // Update an existing worker
                 await updateWorker(id, workerForm);
                 enqueueSnackbar('Worker updated successfully', {
                     variant: 'success',
@@ -170,7 +156,7 @@ const WorkerEditView: FunctionComponent<any> = () => {
                     <Grid item xs={12} sm={6}>
                         <DatePicker className="w-100"
                             label="Date Hired"
-                            value={workerForm.DateHired}
+                            value={dayjs(workerForm.DateHired)}
                             onChange={handleDateHiredChange}
                         />
                     </Grid>

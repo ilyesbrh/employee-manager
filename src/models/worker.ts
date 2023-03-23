@@ -29,7 +29,7 @@ export type WorkerForm = {
     PostalCode: string;
     MobileNumber: string;
     PhoneNumber: string;
-    DateHired: Dayjs;
+    DateHired: string;
     Position: string;
     EmployeeNumber: string;
     EmergencyContact1: string;
