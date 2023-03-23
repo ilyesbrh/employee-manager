@@ -1,0 +1,16 @@
+.main-container {
+    gap: 16px;
+
+    >* {
+        flex: 1;
+    }
+
+    .filters-container {
+        flex: 0;
+        min-width: 360px;
+    }
+
+    .table-row{
+        cursor: pointer;
+    }
+}
