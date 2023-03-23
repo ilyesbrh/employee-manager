@@ -1,19 +1,54 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import './index.scss';
+import { store } from './store/store';
+import WorkersList from './app/Layout/workersList/workerList';
+import WorkerDetails from './app/Layout/workerDetails/workerDetails';
+import WorkerEditView from './app/Layout/workerEditView/workerEditView';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const container = document.getElementById('root')!;
+const root = createRoot(container);
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: '',
+        element: <Navigate to="/workers" replace />
+      },
+      {
+        path: "workers",
+        element: <WorkersList />,
+      },
+      {
+        path: "workers/:id",
+        element: <WorkerDetails />,
+      },
+      {
+        path: "workers/edit",
+        element: <WorkerEditView />,
+      },
+      {
+        path: "workers/:id/edit",
+        element: <WorkerEditView />,
+      },
+      {
+        path: '*',
+        element: <Navigate to="/workers" replace />
+      }
+    ],
+  },
+]);
+
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider >
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
